@@ -1,6 +1,8 @@
 Тестовое_Джанго_Экосистема_Альфа*
-test2/.venv/
+.venv/
+images/
 __pycache__/
+*.sqlite3
 .isort.cfg
 .vscode/settings.json
 requirements_lint.txt

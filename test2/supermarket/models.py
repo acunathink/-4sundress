@@ -10,8 +10,8 @@ class CustomUser(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
 
-class Category(models.Model):
-    name = models.CharField(verbose_name='Категория',
+class BaseCategory(models.Model):
+    name = models.CharField(verbose_name='Наименование',
                             max_length=64, unique=True,
                             null=False, blank=False)
     slug = models.SlugField(verbose_name='slug-имя',
@@ -23,10 +23,24 @@ class Category(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    class Meta:
+        abstract = True
 
-class SubCategory(Category):
+
+class Category(BaseCategory):
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+
+class SubCategory(BaseCategory):
     category = models.ForeignKey(Category, related_name='subcategories',
                                  on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Подкатегория'
+        verbose_name_plural = 'Подкатегории'
 
 
 class Goods(models.Model):
@@ -35,7 +49,7 @@ class Goods(models.Model):
                             null=False, blank=False)
     category = models.ForeignKey(Category, related_name='goods',
                                  on_delete=models.CASCADE)
-    subcategory = models.ForeignKey(SubCategory, related_name='goods',
+    subcategory = models.ForeignKey(SubCategory, related_name='items',
                                     on_delete=models.CASCADE)
     slug = models.SlugField(verbose_name='slug-имя',
                             max_length=64, unique=True,
