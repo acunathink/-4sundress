@@ -66,6 +66,10 @@ class Goods(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    class Meta:
+        verbose_name = 'Продукты'
+        verbose_name_plural = 'Продукты'
+
 
 class ShoppingCart(models.Model):
     buyer = models.ForeignKey(CustomUser, related_name='cart',
