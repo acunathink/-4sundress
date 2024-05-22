@@ -4,5 +4,5 @@ images/
 __pycache__/
 *.sqlite3
 .isort.cfg
-.vscode/settings.json
+.vscode/
 requirements_lint.txt

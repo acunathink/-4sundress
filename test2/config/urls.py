@@ -3,10 +3,11 @@ from django.urls import include, path, re_path
 
 from rest_framework.routers import DefaultRouter
 
-from supermarket.views import CategoryViewSet
+from supermarket.views import CategoryViewSet, GoodsViewSet
 
 supermarket_router = DefaultRouter()
 supermarket_router.register(r'categories', CategoryViewSet)
+supermarket_router.register(r'goods', GoodsViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
