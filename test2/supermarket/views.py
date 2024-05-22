@@ -1,7 +1,8 @@
 from rest_framework import pagination, permissions, viewsets
 
 from .models import Category, Goods, ShoppingCart
-from .serializers import CategorySerializer, GoodsSerializer
+from .serializers import (CategorySerializer, GoodsSerializer,
+                          ShoppingCartSerializer)
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -19,4 +20,13 @@ class GoodsViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ShoppingCartViewSet(viewsets.ModelViewSet):
-    pass
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = pagination.LimitOffsetPagination
+    serializer_class = ShoppingCartSerializer
+
+    def get_queryset(self):
+        return ShoppingCart.objects.filter(buyer=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(buyer=self.request.user)
+        # return super().perform_create(serializer)

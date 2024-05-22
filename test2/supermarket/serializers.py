@@ -1,6 +1,8 @@
 from django.db.models import ImageField
+from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy
 
-from rest_framework import serializers
+from rest_framework import exceptions, serializers, validators
 
 from .models import Category, Goods, ShoppingCart, SubCategory
 
@@ -21,8 +23,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GoodsSerializer(serializers.ModelSerializer):
-    category = serializers.CharField()
-    subcategory = serializers.CharField()
+    category = serializers.StringRelatedField()
+    subcategory = serializers.StringRelatedField()
     image_list = serializers.SerializerMethodField()
 
     class Meta:
@@ -38,3 +40,36 @@ class GoodsSerializer(serializers.ModelSerializer):
             obj.__getattribute__(image).url for image in image_fields
         ]
         return image_list
+
+
+class GoodsSerializerField(serializers.Field):
+    def run_validation(self, data):
+        if not isinstance(data, int):
+            raise exceptions.ValidationError(gettext_lazy(
+                f"expected a number but got '{data}'"))
+        return super().run_validation(data)
+
+    def to_internal_value(self, data):
+        obj = get_object_or_404(Goods, pk=data)
+        return obj
+
+    def to_representation(self, obj):
+        return obj.name
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    goods = GoodsSerializerField()
+    buyer = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        model = ShoppingCart
+        fields = 'goods', 'amount', 'buyer',  # 'id'
+        validators = [
+            validators.UniqueTogetherValidator(
+                queryset=ShoppingCart.objects.all(),
+                fields=['buyer', 'goods'],
+                message='товар уже в корзине'
+            )
+        ]

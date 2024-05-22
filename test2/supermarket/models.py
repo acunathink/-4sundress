@@ -78,3 +78,11 @@ class ShoppingCart(models.Model):
                               on_delete=models.CASCADE)
     amount = models.SmallIntegerField(verbose_name='Количество', null=False,
                                       validators=[MinValueValidator(1)])
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['buyer', 'goods'],
+                name='unique_goods_in_cart'
+            )
+        ]
