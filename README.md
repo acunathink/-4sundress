@@ -24,8 +24,7 @@ python test1/main.py
 ```
 python manage.py migrate
 ```
-- 
-<sub>и запустите проект - по ендпоинту api/redoc будет достуна документация в формате OpenAPI 2.0</sub>
+- запустите проект - по ендпоинту api/redoc будет достуна документация в формате OpenAPI 2.0
 ```
 python manage.py runserver
 ```
