@@ -14,6 +14,7 @@ supermarket_router.register(r'shopping_goods', ShoppingGoodsViewSet,
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include('supermarket.urls')),
     path('auth/', include('djoser.urls.base')),
     path('auth/', include('djoser.urls.authtoken')),
     path('shopping_cart/', ShoppingCartAPIView.as_view()),
