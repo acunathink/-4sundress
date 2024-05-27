@@ -2,6 +2,7 @@
 .venv/
 images/
 __pycache__/
+.env
 *.sqlite3
 .isort.cfg
 .vscode/
