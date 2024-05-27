@@ -1,8 +1,6 @@
 from django.db.models import ImageField
-from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext_lazy
 
-from rest_framework import exceptions, serializers, validators
+from rest_framework import serializers, validators
 
 from .models import Category, Goods, ShoppingCart, SubCategory
 
@@ -36,36 +34,17 @@ class GoodsSerializer(serializers.ModelSerializer):
     def get_image_list(self, obj: Goods):
         image_fields = [field.name for field in Goods._meta.get_fields()
                         if isinstance(field, ImageField)]
-        image_list = [
-            obj.__getattribute__(image).url for image in image_fields
-        ]
-        return image_list
+        return [obj.__getattribute__(image).url for image in image_fields]
 
 
-class GoodsSerializerField(serializers.Field):
-    def run_validation(self, data):
-        if not isinstance(data, int):
-            raise exceptions.ValidationError(gettext_lazy(
-                f"expected a number but got '{data}'"))
-        return super().run_validation(data)
-
-    def to_internal_value(self, data):
-        obj = get_object_or_404(Goods, pk=data)
-        return obj
-
-    def to_representation(self, obj):
-        return obj.name
-
-
-class ShoppingCartSerializer(serializers.ModelSerializer):
-    goods = GoodsSerializerField()
+class ShoppingGoodsSerializer(serializers.ModelSerializer):
     buyer = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
 
     class Meta:
         model = ShoppingCart
-        fields = 'goods', 'amount', 'buyer',  # 'id'
+        fields = 'goods', 'amount', 'buyer', 'id'
         validators = [
             validators.UniqueTogetherValidator(
                 queryset=ShoppingCart.objects.all(),
@@ -73,3 +52,15 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
                 message='товар уже в корзине'
             )
         ]
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    total_price = serializers.SerializerMethodField()
+    goods = serializers.StringRelatedField()
+
+    class Meta:
+        model = ShoppingCart
+        fields = ['goods', 'amount', 'total_price']
+
+    def get_total_price(self, obj):
+        return obj.amount * obj.goods.price
